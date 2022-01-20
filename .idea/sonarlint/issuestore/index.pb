@@ -1,14 +1,8 @@
 
 o
 ?app/src/main/java/faba/app/goodwallweatherapp/utils/DateUtil.kt,3\4\34ec6f9bc9b00c2daea500a0bd2c773227e8d28f
-…
-Uapp/src/main/java/faba/app/goodwallweatherapp/service/NetworkConnectionInterceptor.kt,2\b\2b2061f8ef163159df8f1cff7a231ca9fc224259
 m
 =app/src/main/java/faba/app/goodwallweatherapp/utils/Status.kt,c\9\c926f5de841e96039157082579971e39777946bb
-t
-Dapp/src/main/java/faba/app/goodwallweatherapp/service/APIResponse.kt,1\f\1fe42992c012877dcda76d792eca1d0ae941d973
-x
-Happ/src/main/java/faba/app/goodwallweatherapp/service/RetrofitService.kt,4\e\4e5d0f762369079fba5a03cac13a1ab9f747b360
 {
 Kapp/src/main/java/faba/app/goodwallweatherapp/models/current/MainCurrent.kt,b\c\bc362990c3aa95e767661d14da0ec4ce193f3d1f
 u
@@ -37,7 +31,9 @@ Mapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/WindForecast.kt,
 Mapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/ForecastDays.kt,0\6\06a91ccf778155b602a2517fd583f38744d3a3ed
 p
 @app/src/main/java/faba/app/goodwallweatherapp/utils/Constants.kt,d\b\db08c6b25c4ecda66612fc3268f07c33357785de
-t
-Dapp/src/main/java/faba/app/goodwallweatherapp/database/WeatherDao.kt,2\a\2a6c1c612aa4338034ee4c3e55e49f648562be50
 }
 Mapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/ForecastData.kt,8\a\8a25c955a65f4ecce5c3a7cfccbbcf91f8707fb4
+}
+Mapp/src/main/java/faba/app/goodwallweatherapp/database/WeatherRoomDatabase.kt,8\7\87d2a9e14809e36d21233f6411fc7db3756e55c0
+s
+Capp/src/main/java/faba/app/goodwallweatherapp/WeatherApplication.kt,c\6\c6d1d37a1fed6c1c41f15898eb4b381f9a5d691c

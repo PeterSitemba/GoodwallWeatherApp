@@ -70,8 +70,8 @@ class WeatherRepository @Inject constructor(
         val currentWeatherDataObservable: Single<WeatherData> =
             retrofitService.getCurrentWeather(lat, lon, appId, units = "metric")
 
-        val apiObservable =  currentWeatherDataObservable
-            .toObservable().doOnNext{
+        val apiObservable = currentWeatherDataObservable
+            .toObservable().doOnNext {
                 insertCurrent(it)
             }
 
@@ -89,8 +89,8 @@ class WeatherRepository @Inject constructor(
         val currentWeatherDataObservable: Single<ForecastData> =
             retrofitService.getWeatherForecast(lat, lon, appId, units = "metric")
 
-        val apiObservable =  currentWeatherDataObservable
-            .toObservable().doOnNext{
+        val apiObservable = currentWeatherDataObservable
+            .toObservable().doOnNext {
                 insertForecast(it)
             }
 
@@ -126,7 +126,8 @@ class WeatherRepository @Inject constructor(
     ) {
         disposable.add(
             Observable.concat(db, remote)
-                .timeout(100, TimeUnit.MILLISECONDS)
+                .filter { it.weather.isNotEmpty() }
+                .timeout(400, TimeUnit.MILLISECONDS)
                 .onErrorResumeNext(remote)
                 .firstElement()
                 .subscribeOn(Schedulers.newThread())
@@ -151,7 +152,7 @@ class WeatherRepository @Inject constructor(
     ) {
         disposable.add(
             Observable.concat(db, remote)
-                .timeout(100, TimeUnit.MILLISECONDS)
+                .timeout(400, TimeUnit.MILLISECONDS)
                 .onErrorResumeNext(remote)
                 .firstElement()
                 .subscribeOn(Schedulers.newThread())

@@ -16,6 +16,7 @@ import faba.app.goodwallweatherapp.service.NetworkConnectionInterceptor
 import faba.app.goodwallweatherapp.service.RetrofitService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -32,6 +33,7 @@ object AppModule {
     fun provideRetrofit(gson: Gson, @ApplicationContext appContext: Context): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.openweathermap.org/data/2.5/weather/")
         .addConverterFactory(GsonConverterFactory.create(gson))
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(getOkhttpClient(appContext)!!)
         .build()
 

@@ -40,4 +40,8 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         repository.getWeatherForecast(lat, lon, appId)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        repository.clear()
+    }
 }

@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         weatherViewModel.currentWeather.observe(this, { response ->
-
             when (response.status) {
                 Status.LOADING -> {
                     Log.e("MainActivity", "Loading...")
@@ -36,9 +35,9 @@ class MainActivity : AppCompatActivity() {
                     Log.e("MainActivity", "Error!!!")
                 }
                 else -> {
-                   response.data.let {
-                       Log.e("MainActivity", it!!.main.temp.toString())
-                   }
+                    response.data.let {
+                        Log.e("MainActivity", it!!.main.temp.toString())
+                    }
                 }
             }
 
