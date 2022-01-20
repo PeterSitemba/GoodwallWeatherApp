@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Goodwall WeatherApp</string>
+
+    <!--Errors-->
+    <string name="error_noConnection">No internet connection.</string>
+</resources>
