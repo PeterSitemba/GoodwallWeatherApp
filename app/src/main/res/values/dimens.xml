@@ -11,7 +11,7 @@
     <dimen name="txt_xxxxlarge">45sp</dimen>
 
     <!--header_height-->
-    <dimen name="header_height">330dp</dimen>
+    <dimen name="header_height">380dp</dimen>
 
 
     <!-- Margin -->

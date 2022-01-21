@@ -2,32 +2,27 @@ package faba.app.goodwallweatherapp.view.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
-import faba.app.goodwallweatherapp.models.forecast.ForecastData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
+import faba.app.goodwallweatherapp.utils.SpanningLinearLayoutManager
 import faba.app.goodwallweatherapp.utils.Status
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
 import kotlin.math.roundToInt
-import android.view.WindowManager
 
 
 class HomeFragment : Fragment() {
 
     val weatherViewModel: WeatherViewModel by activityViewModels()
-    private lateinit var listAdapter: ForecastAdapter
     var forecastList: MutableList<ForecastDays> = mutableListOf()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +33,9 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val listAdapter = ForecastAdapter { forecastDays -> adapterOnClick(forecastDays) }
+
 
         weatherViewModel.getCurrentWeather(
             -1.3761848,
@@ -51,13 +49,20 @@ class HomeFragment : Fragment() {
         )
 
         activity?.let { observeCurrentViewModel(it) }
-        context?.let { observeForecastViewModel(it) }
+        observeForecastViewModel(listAdapter)
 
-        rvForecast.layoutManager = LinearLayoutManager(
+        rvForecast.layoutManager = SpanningLinearLayoutManager(
             activity,
-            LinearLayoutManager.VERTICAL,
+            SpanningLinearLayoutManager.VERTICAL,
             false
         )
+        rvForecast.adapter = listAdapter
+
+
+    }
+
+    private fun adapterOnClick(forecastDays: ForecastDays) {
+        Log.e("HomeFrag", "Clicked ${forecastDays.dt_txt}")
     }
 
     private fun observeCurrentViewModel(context: Context) {
@@ -121,15 +126,15 @@ class HomeFragment : Fragment() {
             }
         }
 
+        txtName.text = weatherData.name
         txtTemp.text = "${weatherData.main.temp.roundToInt()}\u00B0"
-
         txtMinTemp.text = "${weatherData.main.temp_min.roundToInt()}\u00B0"
         txtCurrentTemp.text = "${weatherData.main.temp.roundToInt()}\u00B0"
         txtMaxTemp.text = "${weatherData.main.temp_max.roundToInt()}\u00B0"
     }
 
 
-    private fun observeForecastViewModel(context: Context) {
+    private fun observeForecastViewModel(listAdapter: ForecastAdapter) {
         weatherViewModel.forecastWeather.observe(this, { response ->
             when (response.status) {
                 Status.LOADING -> {
@@ -140,17 +145,11 @@ class HomeFragment : Fragment() {
                 }
                 else -> {
                     response.data.let {
-                        forecastList = it!!.list.toMutableList()
-
-                        forecastList.filter { forecastsDays ->
+                        forecastList = it!!.list.toMutableList().filter { forecastsDays ->
                             forecastsDays.dt_txt.contains("12:00:00")
-                        }
+                        }.toMutableList()
 
-                        listAdapter =
-                            ForecastAdapter(context, forecastList.filter { forecastsDays ->
-                                forecastsDays.dt_txt.contains("12:00:00")
-                            }.toMutableList())
-                        rvForecast.adapter = listAdapter
+                        listAdapter.submitList(forecastList)
                     }
                 }
             }

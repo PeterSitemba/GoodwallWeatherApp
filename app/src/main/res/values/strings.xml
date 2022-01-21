@@ -6,6 +6,7 @@
 
 
     <!--Content-->
+    <string name="town">TOWN</string>
     <string name="degree">25\u00B0</string>
     <string name="weather">SUNNY</string>
 
