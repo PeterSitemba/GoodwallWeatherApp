@@ -1,6 +1,4 @@
 
-m
-=app/src/main/java/faba/app/goodwallweatherapp/utils/Status.kt,c\9\c926f5de841e96039157082579971e39777946bb
 {
 Kapp/src/main/java/faba/app/goodwallweatherapp/models/current/MainCurrent.kt,b\c\bc362990c3aa95e767661d14da0ec4ce193f3d1f
 u

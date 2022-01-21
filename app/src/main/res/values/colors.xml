@@ -13,5 +13,7 @@
     <color name="cloudy">#54717A</color>
     <color name="rainy">#57575D</color>
 
+    <color name="sunny_header">#f1b914</color>
+
 
 </resources>

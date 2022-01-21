@@ -19,7 +19,7 @@
             android:text="@string/degree"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="@dimen/txt_xxxlarge"
+            android:textSize="@dimen/txt_xxxxlarge"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/txtWeather"
             app:layout_constraintEnd_toEndOf="parent"
