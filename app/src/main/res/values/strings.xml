@@ -3,4 +3,16 @@
 
     <!--Errors-->
     <string name="error_noConnection">No internet connection.</string>
+
+
+    <!--Content-->
+    <string name="degree">25\u00B0</string>
+    <string name="weather">SUNNY</string>
+
+    <string name="min_temp">Min</string>
+    <string name="current_temp">Current</string>
+    <string name="max_temp">Max</string>
+
+
+
 </resources>

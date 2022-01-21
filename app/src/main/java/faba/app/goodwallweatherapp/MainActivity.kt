@@ -19,10 +19,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        weatherViewModel.getCurrentWeather(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
-        weatherViewModel.getWeatherForecast(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
+        //weatherViewModel.getCurrentWeather(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
+        //weatherViewModel.getWeatherForecast(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
 
-        observeViewModel()
+        //observeViewModel()
     }
 
     private fun observeViewModel() {

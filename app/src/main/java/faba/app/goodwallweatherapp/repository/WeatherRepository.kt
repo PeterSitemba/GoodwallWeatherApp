@@ -24,29 +24,6 @@ class WeatherRepository @Inject constructor(
     val currentWeatherDataResponse = MutableLiveData<APIResponse<WeatherData>>()
     val forecastWeatherDataResponse = MutableLiveData<APIResponse<ForecastData>>()
 
-
-    /* fun getCurrentWeather(
-         lat: Double,
-         lon: Double,
-         appId: String
-     ) = retrofitService.getCurrentWeather(
-         lat,
-         lon,
-         appId,
-         units = "metric"
-     )
-
-     fun getWeatherForecast(
-         lat: Double,
-         lon: Double,
-         appId: String
-     ) = retrofitService.getWeatherForecast(
-         lat,
-         lon,
-         appId,
-         units = "metric"
-     )*/
-
     fun insertCurrent(weatherData: WeatherData) {
         weatherDao.insertCurrentWeather(weatherData)
     }
@@ -54,9 +31,6 @@ class WeatherRepository @Inject constructor(
     fun insertForecast(forecastData: ForecastData) {
         weatherDao.insertForecastWeather(forecastData)
     }
-
-    val roomCurrentWeatherList = weatherDao.getAllCurrentWeatherData()
-    val roomWeatherForecastList = weatherDao.getAllWeatherForecast()
 
     val getRowCount = weatherDao.getRowCount()
     val getForecastRowCount = weatherDao.getForecastRowCount()
