@@ -1,6 +1,4 @@
 
-o
-?app/src/main/java/faba/app/goodwallweatherapp/utils/DateUtil.kt,3\4\34ec6f9bc9b00c2daea500a0bd2c773227e8d28f
 m
 =app/src/main/java/faba/app/goodwallweatherapp/utils/Status.kt,c\9\c926f5de841e96039157082579971e39777946bb
 {

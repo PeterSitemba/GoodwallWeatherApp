@@ -1,5 +1,6 @@
 package faba.app.goodwallweatherapp.view.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,9 +22,7 @@ class HomeFragment : Fragment() {
 
     val weatherViewModel: WeatherViewModel by activityViewModels()
     private lateinit var listAdapter: ForecastAdapter
-
     var forecastList: MutableList<ForecastDays> = mutableListOf()
-
 
 
     override fun onCreateView(
@@ -48,16 +47,13 @@ class HomeFragment : Fragment() {
         )
 
         observeCurrentViewModel()
-        observeForecastViewModel()
+        context?.let { observeForecastViewModel(it) }
 
         rvForecast.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
         )
-        listAdapter = context?.let { ForecastAdapter(it) }!!
-        rvForecast.adapter = listAdapter
-
     }
 
     private fun observeCurrentViewModel() {
@@ -79,7 +75,7 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun observeForecastViewModel() {
+    private fun observeForecastViewModel(context: Context) {
         weatherViewModel.forecastWeather.observe(this, { response ->
             when (response.status) {
                 Status.LOADING -> {
@@ -91,6 +87,16 @@ class HomeFragment : Fragment() {
                 else -> {
                     response.data.let {
                         forecastList = it!!.list.toMutableList()
+
+                        forecastList.filter { forecastsDays ->
+                            forecastsDays.dt_txt.contains("12:00:00")
+                        }
+
+                        listAdapter =
+                            ForecastAdapter(context, forecastList.filter { forecastsDays ->
+                                forecastsDays.dt_txt.contains("12:00:00")
+                            }.toMutableList())
+                        rvForecast.adapter = listAdapter
                     }
                 }
             }
