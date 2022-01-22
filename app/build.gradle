@@ -38,6 +38,7 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
 }
 
 dependencies {
@@ -105,5 +106,8 @@ dependencies {
 
     // Feature module Support
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+    implementation "com.github.permissions-dispatcher:permissionsdispatcher:$permissions"
+    kapt "com.github.permissions-dispatcher:permissionsdispatcher-processor:$permissions"
 
 }

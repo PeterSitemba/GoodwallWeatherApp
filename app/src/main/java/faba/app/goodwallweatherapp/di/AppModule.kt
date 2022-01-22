@@ -62,8 +62,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRepository(retrofitService: RetrofitService, weatherDao : WeatherDao) =
-        WeatherRepository(retrofitService, weatherDao)
+    fun provideRepository(retrofitService: RetrofitService, weatherDao : WeatherDao, @ApplicationContext appContext: Context) =
+        WeatherRepository(retrofitService, weatherDao, appContext)
 
     @Singleton
     @Provides

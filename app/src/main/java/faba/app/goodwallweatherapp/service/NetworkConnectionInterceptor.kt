@@ -23,7 +23,7 @@ class NetworkConnectionInterceptor(val context: Context) : Interceptor {
         }
     }
 
-    private fun isNetworkAvailable(): Boolean {
+     fun isNetworkAvailable(): Boolean {
         var result = false
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -54,7 +54,7 @@ class NetworkConnectionInterceptor(val context: Context) : Interceptor {
         return result
     }
 
-    private fun isInternetAvailable(): Boolean {
+     fun isInternetAvailable(): Boolean {
         return try {
             if (isNetworkAvailable()) {
                 val ipAddr: InetAddress = InetAddress.getByName("google.com")

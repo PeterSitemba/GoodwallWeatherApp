@@ -7,8 +7,8 @@ import faba.app.goodwallweatherapp.database.Converter
 
 @Entity(tableName = "weather_forecast_table")
 data class ForecastData(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey
+    val id: Int = 1,
     @TypeConverters(Converter::class) val city: City,
     val cnt: Int,
     val cod: String,

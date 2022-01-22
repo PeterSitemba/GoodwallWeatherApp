@@ -14,6 +14,16 @@
     <string name="current_temp">Current</string>
     <string name="max_temp">Max</string>
 
+    <string name="permission_required_text">"Location permission is needed for accurate weather forecast"</string>
+
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+
+    <string name="permission_location_denied">Location Permissions denied</string>
+    <string name="permission_location_never_ask_again">Location permissions were denied with never ask again.</string>
+
+
+
 
 
 </resources>

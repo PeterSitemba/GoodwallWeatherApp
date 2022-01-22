@@ -1,10 +1,13 @@
 package faba.app.goodwallweatherapp.repository
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import faba.app.goodwallweatherapp.database.WeatherDao
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastData
 import faba.app.goodwallweatherapp.service.APIResponse
+import faba.app.goodwallweatherapp.service.NetworkConnectionInterceptor
 import faba.app.goodwallweatherapp.service.RetrofitService
 import faba.app.goodwallweatherapp.utils.Status
 import io.reactivex.Observable
@@ -17,7 +20,8 @@ import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(
     private val retrofitService: RetrofitService,
-    private val weatherDao: WeatherDao
+    private val weatherDao: WeatherDao,
+    private val context: Context
 ) {
 
     private val disposable = CompositeDisposable()
@@ -46,8 +50,24 @@ class WeatherRepository @Inject constructor(
 
         val apiObservable = currentWeatherDataObservable
             .toObservable().doOnNext {
-                insertCurrent(it)
+                var weatherData = WeatherData(
+                    1,
+                    it.base,
+                    it.clouds,
+                    it.cod,
+                    it.coord,
+                    it.dt,
+                    it.main,
+                    it.name,
+                    it.sys,
+                    it.timezone,
+                    it.visibility,
+                    it.weather,
+                    it.wind
+                )
+                insertCurrent(weatherData)
             }
+
 
         val dbObservable = weatherDao.getAllCurrentWeatherData()
 
@@ -98,51 +118,96 @@ class WeatherRepository @Inject constructor(
         db: Observable<WeatherData>,
         remote: Observable<WeatherData>
     ) {
-        disposable.add(
-            Observable.concat(db, remote)
-                .filter { it.weather.isNotEmpty() }
-                .timeout(400, TimeUnit.MILLISECONDS)
-                .onErrorResumeNext(remote)
-                .firstElement()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    updateResponseCurrent(Status.LOADING)
-                }
-                .subscribe(
-                    {
-                        updateResponseCurrent(Status.SUCCESS, it)
-                    },
-                    {
-                        updateResponseCurrent(Status.ERROR, null, it.localizedMessage)
-                    }
+        if (NetworkConnectionInterceptor(context).isNetworkAvailable()) {
+            Log.e("Weather repo", "Internet available")
 
-                ))
+            disposable.add(
+                Observable.concat(db, remote)
+                    .filter { false }
+                    .timeout(100, TimeUnit.MILLISECONDS)
+                    .onErrorResumeNext(remote)
+                    .firstElement()
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        updateResponseCurrent(Status.LOADING)
+                    }
+                    .subscribe(
+                        {
+                            updateResponseCurrent(Status.SUCCESS, it)
+                        },
+                        {
+                            updateResponseCurrent(Status.ERROR, null, it.localizedMessage)
+                        }
+
+                    ))
+
+        } else {
+            Log.e("Weather repo", "No Internet")
+            disposable.add(
+                db.subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        updateResponseCurrent(Status.LOADING)
+                    }
+                    .subscribe(
+                        {
+                            updateResponseCurrent(Status.SUCCESS, it)
+                        },
+                        {
+                            updateResponseCurrent(Status.ERROR, null, it.localizedMessage)
+                        }
+
+                    ))
+
+        }
+
     }
 
     private fun observeForecast(
         db: Observable<ForecastData>,
         remote: Observable<ForecastData>
     ) {
-        disposable.add(
-            Observable.concat(db, remote)
-                .timeout(400, TimeUnit.MILLISECONDS)
-                .onErrorResumeNext(remote)
-                .firstElement()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    updateResponseForecast(Status.LOADING)
-                }
-                .subscribe(
-                    {
-                        updateResponseForecast(Status.SUCCESS, it)
-                    },
-                    {
-                        updateResponseForecast(Status.ERROR, null, it.localizedMessage)
-                    }
 
-                ))
+        if (NetworkConnectionInterceptor(context).isNetworkAvailable()) {
+            disposable.add(
+                Observable.concat(db, remote)
+                    .filter { false }
+                    .timeout(100, TimeUnit.MILLISECONDS)
+                    .onErrorResumeNext(remote)
+                    .firstElement()
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        updateResponseForecast(Status.LOADING)
+                    }
+                    .subscribe(
+                        {
+                            updateResponseForecast(Status.SUCCESS, it)
+                        },
+                        {
+                            updateResponseForecast(Status.ERROR, null, it.localizedMessage)
+                        }
+
+                    ))
+        } else {
+            disposable.add(
+                db.subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        updateResponseForecast(Status.LOADING)
+                    }
+                    .subscribe(
+                        {
+                            updateResponseForecast(Status.SUCCESS, it)
+                        },
+                        {
+                            updateResponseForecast(Status.ERROR, null, it.localizedMessage)
+                        }
+
+                    ))
+
+        }
     }
 
     fun clear() {

@@ -1,13 +1,23 @@
 package faba.app.goodwallweatherapp.view.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.*
+import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.*
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
@@ -16,13 +26,16 @@ import faba.app.goodwallweatherapp.utils.Status
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
+import permissions.dispatcher.*
 import kotlin.math.roundToInt
 
-
+@RuntimePermissions
 class HomeFragment : Fragment() {
 
+    lateinit var latitude: String
     val weatherViewModel: WeatherViewModel by activityViewModels()
     var forecastList: MutableList<ForecastDays> = mutableListOf()
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,20 +49,15 @@ class HomeFragment : Fragment() {
 
         val listAdapter = ForecastAdapter { forecastDays -> adapterOnClick(forecastDays) }
 
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(activity as AppCompatActivity)
 
-        weatherViewModel.getCurrentWeather(
-            -1.3761848,
-            36.676677,
-            "2a5ac244383461b7c2225b066ef65029"
-        )
-        weatherViewModel.getWeatherForecast(
-            -1.3761848,
-            36.676677,
-            "2a5ac244383461b7c2225b066ef65029"
-        )
+        getLastLocationWithPermissionCheck()
 
-        activity?.let { observeCurrentViewModel(it) }
+        observeCurrentViewModel()
         observeForecastViewModel(listAdapter)
+
+
 
         rvForecast.layoutManager = SpanningLinearLayoutManager(
             activity,
@@ -58,14 +66,39 @@ class HomeFragment : Fragment() {
         )
         rvForecast.adapter = listAdapter
 
-
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // NOTE: delegate the permission handling to generated method
+        onRequestPermissionsResult(requestCode, grantResults)
+    }
+
+
+      fun initWeather(lat: Double, lon: Double) {
+          weatherViewModel.getCurrentWeather(
+              lat,
+              lon,
+              "2a5ac244383461b7c2225b066ef65029"
+          )
+          weatherViewModel.getWeatherForecast(
+              lat,
+              lon,
+              "2a5ac244383461b7c2225b066ef65029"
+          )
+      }
+
+
 
     private fun adapterOnClick(forecastDays: ForecastDays) {
         Log.e("HomeFrag", "Clicked ${forecastDays.dt_txt}")
     }
 
-    private fun observeCurrentViewModel(context: Context) {
+    private fun observeCurrentViewModel() {
         weatherViewModel.currentWeather.observe(this, { response ->
             when (response.status) {
                 Status.LOADING -> {
@@ -78,7 +111,7 @@ class HomeFragment : Fragment() {
                     response.data.let {
                         Log.e("MainActivity", it!!.main.temp.toString())
 
-                        initHeaderView(it, context)
+                        initHeaderView(it)
                     }
                 }
             }
@@ -87,7 +120,7 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun initHeaderView(weatherData: WeatherData, context: Context) {
+    private fun initHeaderView(weatherData: WeatherData) {
 
         val window: Window = activity?.window!!
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -158,4 +191,104 @@ class HomeFragment : Fragment() {
     }
 
 
+    @SuppressLint("MissingPermission")
+    @NeedsPermission(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    fun getLastLocation() {
+        if (isLocationEnabled()) {
+            fusedLocationClient.lastLocation.addOnCompleteListener(activity as AppCompatActivity) { task ->
+                val location: Location? = task.result
+                if (location == null) {
+                    requestNewLocationData()
+                } else {
+                    latitude = location.latitude.toString()
+                    initWeather(location.latitude, location.longitude)
+
+                }
+            }
+        } else {
+            Toast.makeText(activity, "Turn on location", Toast.LENGTH_LONG)
+                .show()
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(intent)
+        }
+
+    }
+
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager =
+            activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestNewLocationData() {
+        val mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
+
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(activity as AppCompatActivity)
+        fusedLocationClient.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            Looper.myLooper()!!
+        )
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val mLastLocation: Location = locationResult.lastLocation
+            latitude = mLastLocation.latitude.toString()
+            initWeather(mLastLocation.latitude, mLastLocation.longitude)
+        }
+    }
+
+
+    @OnShowRationale(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    fun showRationaleForLocation(request: PermissionRequest) {
+        showRationaleDialog(R.string.permission_required_text, request)
+    }
+
+    @OnPermissionDenied(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    fun onLocationDenied() {
+        Toast.makeText(activity, R.string.permission_location_denied, Toast.LENGTH_SHORT).show()
+        activity?.finish()
+    }
+
+    @OnNeverAskAgain(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    fun onLocationNeverAskAgain() {
+        Toast.makeText(activity, R.string.permission_location_never_ask_again, Toast.LENGTH_SHORT)
+            .show()
+        activity?.finish()
+    }
+
+    private fun showRationaleDialog(@StringRes messageResId: Int, request: PermissionRequest) {
+        AlertDialog.Builder(activity as AppCompatActivity)
+            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
+            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
+            .setCancelable(false)
+            .setMessage(messageResId)
+            .show()
+    }
+
 }
+
+
+
+
