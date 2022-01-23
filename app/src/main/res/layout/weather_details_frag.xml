@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contentMarginLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/margin_medium" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contentMarginRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/margin_medium" />
+
+    <ImageView
+        android:id="@+id/icBackButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:src="@drawable/back_button"
+        app:layout_constraintStart_toStartOf="@+id/contentMarginLeft"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayoutWeather"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="@+id/contentMarginLeft"
+        app:layout_constraintTop_toBottomOf="@+id/icBackButton">
+
+        <TextView
+            android:id="@+id/txtDayDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:textSize="@dimen/txt_xxlarge" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtTempDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15\u00B0"
+                android:textSize="@dimen/txt_xxxxlarge"
+                android:textStyle="bold" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="@dimen/margin_x_small"
+                android:layout_marginTop="@dimen/margin_small"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/txtWeatherDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_x_small"
+                android:text="clouds"
+                android:textSize="@dimen/txt_xlarge" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivDetailsBg"
+        android:layout_width="250dp"
+        android:layout_height="400dp"
+        android:src="@drawable/cloudy_bg_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtSlogan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cloudy- Enjoy the day"
+        android:textSize="@dimen/txt_xxlarge"
+        app:layout_constraintStart_toStartOf="@id/contentMarginLeft"
+        app:layout_constraintTop_toBottomOf="@+id/ivDetailsBg" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDayForecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_small"
+        app:layout_constraintBottom_toTopOf="@+id/dividerTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtSlogan" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dividerTop"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_xxxxxxx_large"
+        app:dividerColor="@android:color/darker_gray"
+        app:layout_constraintBottom_toTopOf="@+id/dividerBottom" />
+
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dividerBottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider"
+        android:layout_marginBottom="@dimen/margin_x_large"
+        app:dividerColor="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dividerTop"
+        app:layout_constraintBottom_toTopOf="@+id/dividerBottom"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/txt_xxlarge"
+            android:text="Wind"
+            />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="@dimen/margin_x_small"
+            android:layout_marginEnd="@dimen/margin_x_small"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/txt_xxlarge"
+            android:text="10km/h"
+            />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

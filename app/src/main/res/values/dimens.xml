@@ -8,7 +8,8 @@
     <dimen name="txt_xlarge">16sp</dimen>
     <dimen name="txt_xxlarge">20sp</dimen>
     <dimen name="txt_xxxlarge">30sp</dimen>
-    <dimen name="txt_xxxxlarge">45sp</dimen>
+    <dimen name="txt_xxxxlarge">35sp</dimen>
+    <dimen name="txt_xxxxxlarge">45sp</dimen>
 
     <!--header_height-->
     <dimen name="header_height">380dp</dimen>

@@ -6,24 +6,31 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import faba.app.goodwallweatherapp.utils.Status
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
+import kotlinx.android.synthetic.main.weather_details_frag.*
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val weatherViewModel : WeatherViewModel by viewModels()
+    lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //weatherViewModel.getCurrentWeather(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
-        //weatherViewModel.getWeatherForecast(-1.3761848, 36.676677, "2a5ac244383461b7c2225b066ef65029")
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
-        //observeViewModel()
+        navController = navHostFragment.navController
+
     }
 
     private fun observeViewModel() {

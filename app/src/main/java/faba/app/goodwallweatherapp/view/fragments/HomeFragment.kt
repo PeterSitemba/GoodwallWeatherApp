@@ -15,14 +15,17 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.location.*
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
+import faba.app.goodwallweatherapp.utils.NavAnimations
 import faba.app.goodwallweatherapp.utils.SpanningLinearLayoutManager
 import faba.app.goodwallweatherapp.utils.Status
+import faba.app.goodwallweatherapp.utils.navigateTo
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
@@ -36,6 +39,10 @@ class HomeFragment : Fragment() {
     val weatherViewModel: WeatherViewModel by activityViewModels()
     var forecastList: MutableList<ForecastDays> = mutableListOf()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    companion object {
+        const val KEY_FORECAST = "forecast_day"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,23 +86,33 @@ class HomeFragment : Fragment() {
     }
 
 
-      fun initWeather(lat: Double, lon: Double) {
-          weatherViewModel.getCurrentWeather(
-              lat,
-              lon,
-              "2a5ac244383461b7c2225b066ef65029"
-          )
-          weatherViewModel.getWeatherForecast(
-              lat,
-              lon,
-              "2a5ac244383461b7c2225b066ef65029"
-          )
-      }
-
+    fun initWeather(lat: Double, lon: Double) {
+        weatherViewModel.getCurrentWeather(
+            lat,
+            lon,
+            "2a5ac244383461b7c2225b066ef65029"
+        )
+        weatherViewModel.getWeatherForecast(
+            lat,
+            lon,
+            "2a5ac244383461b7c2225b066ef65029"
+        )
+    }
 
 
     private fun adapterOnClick(forecastDays: ForecastDays) {
-        Log.e("HomeFrag", "Clicked ${forecastDays.dt_txt}")
+
+        val bundle = bundleOf(
+            KEY_FORECAST to forecastDays
+        )
+
+        navController.navigateTo(
+            R.id.action_homeFragment_to_weatherDetailsFrag,
+            bundle,
+            animationsOverride = NavAnimations.DEFAULT
+        )
+
+
     }
 
     private fun observeCurrentViewModel() {
