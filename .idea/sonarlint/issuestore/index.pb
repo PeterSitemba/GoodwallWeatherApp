@@ -19,17 +19,9 @@ Gapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/Clouds.kt,5\c\5c
 Lapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/SysForecast.kt,d\0\d0f3be0ba343ccb9e703710a516570c5947479a2
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
-s
-Capp/src/main/java/faba/app/goodwallweatherapp/WeatherApplication.kt,c\6\c6d1d37a1fed6c1c41f15898eb4b381f9a5d691c
 w
 Gapp/src/main/java/faba/app/goodwallweatherapp/models/current/Weather.kt,6\3\63955c21e630149d0df506a360bedef22004a874
-m
-=app/src/main/java/faba/app/goodwallweatherapp/utils/Status.kt,c\9\c926f5de841e96039157082579971e39777946bb
 }
 Mapp/src/main/java/faba/app/goodwallweatherapp/models/forecast/ForecastData.kt,8\a\8a25c955a65f4ecce5c3a7cfccbbcf91f8707fb4
-m
-=app/src/main/java/faba/app/goodwallweatherapp/di/AppModule.kt,1\b\1be93e704f3f486cbb2e28da5abf9f7821c91a02
-}
-Mapp/src/main/java/faba/app/goodwallweatherapp/database/WeatherRoomDatabase.kt,8\7\87d2a9e14809e36d21233f6411fc7db3756e55c0
 {
 Kapp/src/main/java/faba/app/goodwallweatherapp/models/current/WeatherData.kt,c\e\ce54f6021e1a32b1700b38bec5a80c2c3a58230f

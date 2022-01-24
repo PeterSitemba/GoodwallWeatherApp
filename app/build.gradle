@@ -112,6 +112,8 @@ dependencies {
 
     //Splash screen api
     implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
 
 
 }

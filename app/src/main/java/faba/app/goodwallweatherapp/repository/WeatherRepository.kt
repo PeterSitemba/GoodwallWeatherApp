@@ -38,6 +38,44 @@ class WeatherRepository @Inject constructor(
         weatherDao.insertForecastWeather(forecastData)
     }
 
+    fun getAllNoInternet() {
+        val dbObservableCurrent = weatherDao.getAllCurrentWeatherData()
+        val dbObservableForecast = weatherDao.getAllWeatherForecast()
+
+        disposable.add(
+            dbObservableCurrent.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    updateResponseCurrent(Status.LOADING)
+                }
+                .subscribe(
+                    {
+                        updateResponseCurrent(Status.SUCCESS, it)
+                    },
+                    {
+                        updateResponseCurrent(Status.ERROR, null, it.localizedMessage)
+                    }
+
+                ))
+
+        disposable.add(
+            dbObservableForecast.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    updateResponseForecast(Status.LOADING)
+                }
+                .subscribe(
+                    {
+                        updateResponseForecast(Status.SUCCESS, it)
+                    },
+                    {
+                        updateResponseForecast(Status.ERROR, null, it.localizedMessage)
+                    }
+
+                ))
+
+    }
+
     fun getCurrentWeather(
         lat: Double,
         lon: Double,

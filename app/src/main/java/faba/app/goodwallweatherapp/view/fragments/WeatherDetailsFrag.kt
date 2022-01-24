@@ -3,21 +3,17 @@ package faba.app.goodwallweatherapp.view.fragments
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.utils.DateUtil
 import faba.app.goodwallweatherapp.view.animations.CascadingAnimatedFragment
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
-import kotlinx.android.synthetic.main.list_forecast.view.*
 import kotlinx.android.synthetic.main.weather_details_frag.*
 import kotlin.math.roundToInt
 
 class WeatherDetailsFrag : CascadingAnimatedFragment() {
 
-    val weatherViewModel: WeatherViewModel by activityViewModels()
+    private val weatherViewModel: WeatherViewModel by activityViewModels()
 
 
     override fun onCreateView(

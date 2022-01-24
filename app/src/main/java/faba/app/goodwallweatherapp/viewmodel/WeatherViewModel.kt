@@ -67,6 +67,11 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         repository.getWeatherForecast(lat, lon, appId)
     }
 
+    fun getAllNoInternet() {
+        repository.getAllNoInternet()
+    }
+
+
     fun getRowCount(): Flow<Int?>? {
         return repository.getRowCount()
     }

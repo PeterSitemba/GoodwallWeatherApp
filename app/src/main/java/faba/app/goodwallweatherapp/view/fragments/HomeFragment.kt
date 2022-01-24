@@ -1,18 +1,12 @@
 package faba.app.goodwallweatherapp.view.fragments
 
 import android.Manifest
-import android.animation.AnimatorSet
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.content.Context
-import android.content.Intent
 import android.content.IntentSender
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
-import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -30,12 +24,13 @@ import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
 import faba.app.goodwallweatherapp.service.NetworkConnectionInterceptor
-import faba.app.goodwallweatherapp.view.animations.NavAnimations
+import faba.app.goodwallweatherapp.utils.Constants
 import faba.app.goodwallweatherapp.utils.SpanningLinearLayoutManager
 import faba.app.goodwallweatherapp.utils.Status
 import faba.app.goodwallweatherapp.utils.navigateTo
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.view.animations.CascadingAnimatedFragment
+import faba.app.goodwallweatherapp.view.animations.NavAnimations
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
 import kotlinx.coroutines.launch
@@ -99,16 +94,22 @@ class HomeFragment : CascadingAnimatedFragment() {
             checkConnectionAndDB()
         }
 
+        swiperefresh.setOnRefreshListener {
+            refresh()
+        }
+
     }
 
-    private fun checkConnectionAndDB(){
+    private fun checkConnectionAndDB() {
         lifecycleScope.launch {
             weatherViewModel.getRowCount()?.collect {
-                Log.e("Number is", it.toString())
-                if (it == 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable() ) {
+                if (it == 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
                     weatherViewModel.loading.value = false
                     cLNoInternet.visibility = View.VISIBLE
-                } else{
+                } else if (it!! > 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
+                    cLNoInternet.visibility = View.GONE
+                    weatherViewModel.getAllNoInternet()
+                } else {
                     requestLocation()
                     cLNoInternet.visibility = View.GONE
                 }
@@ -141,18 +142,17 @@ class HomeFragment : CascadingAnimatedFragment() {
         weatherViewModel.getCurrentWeather(
             lat,
             lon,
-            "2a5ac244383461b7c2225b066ef65029"
+            Constants.API_KEY
         )
         weatherViewModel.getWeatherForecast(
             lat,
             lon,
-            "2a5ac244383461b7c2225b066ef65029"
+            Constants.API_KEY
         )
     }
 
 
     private fun adapterOnClick(forecastDays: ForecastDays) {
-
 
         weatherViewModel.selectForecast(forecastDays)
         weatherViewModel.fullForecastList.value =
@@ -165,7 +165,16 @@ class HomeFragment : CascadingAnimatedFragment() {
             animationsOverride = NavAnimations.DEFAULT
         )
 
+    }
 
+    private fun refresh(){
+        if(!NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()){
+            weatherViewModel.getAllNoInternet()
+            Toast.makeText(activity, resources.getString(R.string.error_noConnection), Toast.LENGTH_SHORT).show()
+            swiperefresh.isRefreshing = false
+        }else{
+            requestLocation()
+        }
     }
 
     private fun observeCurrentViewModel() {
@@ -182,9 +191,6 @@ class HomeFragment : CascadingAnimatedFragment() {
                     weatherViewModel.loading.value = false
                     response.data.let {
                         Log.e("MainActivity", it!!.main.temp.toString())
-
-
-
                         initHeaderView(it)
                     }
                 }
@@ -252,8 +258,10 @@ class HomeFragment : CascadingAnimatedFragment() {
                 Status.ERROR -> {
                     weatherViewModel.loading.value = false
                     Log.e("MainActivity", "Error!!!")
+                    swiperefresh.isRefreshing = false
                 }
                 else -> {
+                    swiperefresh.isRefreshing = false
                     weatherViewModel.loading.value = false
 
                     response.data.let {
@@ -317,7 +325,6 @@ class HomeFragment : CascadingAnimatedFragment() {
                 requestNewLocationData()
             } else {
                 initWeather(location.latitude, location.longitude)
-
             }
         }
     }

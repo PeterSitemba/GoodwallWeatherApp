@@ -1,16 +1,11 @@
 package faba.app.goodwallweatherapp.utils
 
-import android.animation.AnimatorSet
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
-import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import faba.app.goodwallweatherapp.view.animations.NavAnimations
 
-fun NavController.navigateTo(@IdRes destId: Int, options: NavOptions?) {
-    navigateTo(destId, null, options)
-}
 
 fun NavController.navigateTo(@IdRes destId: Int, animationsOverride: NavAnimations? = NavAnimations.DEFAULT) {
     navigateTo(destId, null, animationsOverride)
@@ -30,15 +25,6 @@ fun NavController.navigateTo(@IdRes destId: Int, args: Bundle?, options: NavOpti
     }
 }
 
-fun NavController.navigateTo(directions: NavDirections, animationsOverride: NavAnimations? = NavAnimations.DEFAULT) {
-    navigateTo(directions, getNavOptions(directions.actionId, animationsOverride))
-}
-
-fun NavController.navigateTo(directions: NavDirections, options: NavOptions?) {
-    if (!popBackStack(directions.actionId, false)) {
-        navigate(directions, options)
-    }
-}
 
 private fun NavController.getNavOptions(@IdRes destId: Int, animations: NavAnimations?): NavOptions? {
     val currentNavOptions: NavOptions? = currentDestination?.getAction(destId)?.navOptions

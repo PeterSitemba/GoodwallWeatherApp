@@ -4,15 +4,12 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
 import faba.app.goodwallweatherapp.utils.DateUtil
-import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.list_forecast.view.*
 import kotlin.math.roundToInt
 
