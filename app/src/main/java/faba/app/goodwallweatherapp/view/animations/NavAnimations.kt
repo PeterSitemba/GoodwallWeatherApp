@@ -13,9 +13,6 @@ data class NavAnimations(
 ) {
 
     companion object {
-        val NONE: NavAnimations =
-            NavAnimations()
-
         val DEFAULT: NavAnimations =
             NavAnimations(
                 enterAnim = R.anim.slide_in_right,
