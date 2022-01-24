@@ -43,14 +43,17 @@ class WeatherDetailsFrag : CascadingAnimatedFragment() {
         weatherViewModel.selectedForecast.observe(viewLifecycleOwner, { forecastDay ->
             val windSpeed = forecastDay.wind.speed * 3.6
             val weather = forecastDay.weather[0].main
+            var temp =
+                "${forecastDay.main.temp.roundToInt()}${resources.getString(R.string.degree)}"
 
             var day = DateUtil.getDay(forecastDay.dt_txt)
             if (day == DateUtil.getDayOfWeek()) {
                 day = "Today"
+                temp = weatherViewModel.currentTempForecast.value!!
             }
             txtDayDetails.text = day
-            txtTempDetails.text =
-                "${forecastDay.main.temp.roundToInt()}${resources.getString(R.string.degree)}"
+            txtTempDetails.text = temp
+
             txtWindSpeed.text = "${windSpeed.roundToInt()}${resources.getString(R.string.km)}"
             txtHumidity.text =
                 "${forecastDay.main.humidity}${resources.getString(R.string.percent)}"
@@ -78,7 +81,6 @@ class WeatherDetailsFrag : CascadingAnimatedFragment() {
         })
 
         introAnimator.start()
-
 
     }
 

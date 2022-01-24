@@ -28,6 +28,8 @@ class WeatherRepository @Inject constructor(
     val currentWeatherDataResponse = MutableLiveData<APIResponse<WeatherData>>()
     val forecastWeatherDataResponse = MutableLiveData<APIResponse<ForecastData>>()
 
+    fun getRowCount() = weatherDao.getRowCountDistinct()
+
     private fun insertCurrent(weatherData: WeatherData) {
         weatherDao.insertCurrentWeather(weatherData)
     }
@@ -89,7 +91,6 @@ class WeatherRepository @Inject constructor(
         observeForecast(dbObservable, apiObservable)
 
     }
-
 
     private fun updateResponseCurrent(
         status: Status,

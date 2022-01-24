@@ -9,6 +9,7 @@ import faba.app.goodwallweatherapp.models.forecast.ForecastData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
 import faba.app.goodwallweatherapp.repository.WeatherRepository
 import faba.app.goodwallweatherapp.service.APIResponse
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +29,16 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         MutableLiveData<Boolean>()
     }
 
+    val currentTempForecast: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val fullForecastList: MutableLiveData<MutableList<ForecastDays>>  by lazy{
+        MutableLiveData<MutableList<ForecastDays>>()
+    }
+
+
+
 
     fun selectForecast(forecastDays: ForecastDays) {
         mutableSelectedForecast.value = forecastDays
@@ -37,7 +48,7 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         currentWeather = repository.currentWeatherDataResponse
         forecastWeather = repository.forecastWeatherDataResponse
         loading.value = true
-
+        currentTempForecast.value = ""
     }
 
     fun getCurrentWeather(
@@ -54,6 +65,10 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         appId: String
     ) {
         repository.getWeatherForecast(lat, lon, appId)
+    }
+
+    fun getRowCount(): Flow<Int?>? {
+        return repository.getRowCount()
     }
 
     override fun onCleared() {

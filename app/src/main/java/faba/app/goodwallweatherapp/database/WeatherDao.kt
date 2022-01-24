@@ -7,6 +7,8 @@ import androidx.room.Query
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastData
 import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface WeatherDao {
@@ -22,7 +24,10 @@ interface WeatherDao {
     fun deleteAll()
 
     @Query("SELECT COUNT(id) FROM current_weather_table")
-    fun getRowCount(): Observable<Int?>?
+    fun getRowCount(): Flow<Int?>?
+
+    fun getRowCountDistinct() = getRowCount()?.distinctUntilChanged()
+
 
 
 

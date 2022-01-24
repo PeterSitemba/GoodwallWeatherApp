@@ -3,8 +3,11 @@ package faba.app.goodwallweatherapp.view.fragments
 import android.Manifest
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -13,14 +16,20 @@ import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
+import faba.app.goodwallweatherapp.service.NetworkConnectionInterceptor
 import faba.app.goodwallweatherapp.view.animations.NavAnimations
 import faba.app.goodwallweatherapp.utils.SpanningLinearLayoutManager
 import faba.app.goodwallweatherapp.utils.Status
@@ -29,16 +38,33 @@ import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.view.animations.CascadingAnimatedFragment
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
+import kotlinx.coroutines.launch
 import permissions.dispatcher.*
 import kotlin.math.roundToInt
 
 @RuntimePermissions
 class HomeFragment : CascadingAnimatedFragment() {
 
-    lateinit var latitude: String
-    val weatherViewModel: WeatherViewModel by activityViewModels()
+    private val weatherViewModel: WeatherViewModel by activityViewModels()
     var forecastList: MutableList<ForecastDays> = mutableListOf()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val listAdapter = ForecastAdapter { forecastDays -> adapterOnClick(forecastDays) }
+
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+
+            if (result.resultCode == RESULT_OK) {
+                if (NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
+                    requestLocation()
+                } else {
+                    requestLocation()
+                    weatherViewModel.loading.value = false
+                }
+            } else {
+                activity?.finish()
+            }
+        }
 
 
     override fun onCreateView(
@@ -51,16 +77,11 @@ class HomeFragment : CascadingAnimatedFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val listAdapter = ForecastAdapter { forecastDays -> adapterOnClick(forecastDays) }
+
+        checkConnectionAndDB()
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(activity as AppCompatActivity)
-
-        getLastLocationWithPermissionCheck()
-
-        observeCurrentViewModel()
-        observeForecastViewModel(listAdapter)
-
 
         introAnimator.start()
 
@@ -70,6 +91,29 @@ class HomeFragment : CascadingAnimatedFragment() {
             false
         )
         rvForecast.adapter = listAdapter
+
+        observeCurrentViewModel()
+        observeForecastViewModel(listAdapter)
+
+        bRefresh.setOnClickListener {
+            checkConnectionAndDB()
+        }
+
+    }
+
+    private fun checkConnectionAndDB(){
+        lifecycleScope.launch {
+            weatherViewModel.getRowCount()?.collect {
+                Log.e("Number is", it.toString())
+                if (it == 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable() ) {
+                    weatherViewModel.loading.value = false
+                    cLNoInternet.visibility = View.VISIBLE
+                } else{
+                    requestLocation()
+                    cLNoInternet.visibility = View.GONE
+                }
+            }
+        }
 
     }
 
@@ -111,6 +155,11 @@ class HomeFragment : CascadingAnimatedFragment() {
 
 
         weatherViewModel.selectForecast(forecastDays)
+        weatherViewModel.fullForecastList.value =
+            weatherViewModel.fullForecastList.value?.filter { forecastsDays ->
+                forecastsDays.dt_txt.contains(forecastDays.dt_txt.substring(0, 11))
+            }?.toMutableList()
+
         navController.navigateTo(
             R.id.action_homeFragment_to_weatherDetailsFrag,
             animationsOverride = NavAnimations.DEFAULT
@@ -133,6 +182,8 @@ class HomeFragment : CascadingAnimatedFragment() {
                     weatherViewModel.loading.value = false
                     response.data.let {
                         Log.e("MainActivity", it!!.main.temp.toString())
+
+
 
                         initHeaderView(it)
                     }
@@ -187,6 +238,8 @@ class HomeFragment : CascadingAnimatedFragment() {
         txtMinTemp.text = "${weatherData.main.temp_min.roundToInt()}\u00B0"
         txtCurrentTemp.text = "${weatherData.main.temp.roundToInt()}\u00B0"
         txtMaxTemp.text = "${weatherData.main.temp_max.roundToInt()}\u00B0"
+
+        weatherViewModel.currentTempForecast.value = "${weatherData.main.temp.roundToInt()}\u00B0"
     }
 
 
@@ -197,15 +250,20 @@ class HomeFragment : CascadingAnimatedFragment() {
                     Log.e("MainActivity", "Loading...")
                 }
                 Status.ERROR -> {
+                    weatherViewModel.loading.value = false
                     Log.e("MainActivity", "Error!!!")
                 }
                 else -> {
+                    weatherViewModel.loading.value = false
+
                     response.data.let {
                         forecastList = it!!.list.toMutableList().filter { forecastsDays ->
                             forecastsDays.dt_txt.contains("12:00:00")
                         }.toMutableList()
 
                         listAdapter.submitList(forecastList)
+                        listAdapter.setTheCurrentTemp(weatherViewModel.currentTempForecast.value!!)
+                        weatherViewModel.fullForecastList.value = it.list.toMutableList()
                     }
                 }
             }
@@ -213,6 +271,39 @@ class HomeFragment : CascadingAnimatedFragment() {
         })
     }
 
+    private fun requestLocation() {
+
+        val mLocationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            interval = 0
+            fastestInterval = 0
+            numUpdates = 1
+        }
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(mLocationRequest)
+
+        val client: SettingsClient =
+            LocationServices.getSettingsClient(activity as AppCompatActivity)
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+        task.addOnSuccessListener {
+            getLastLocationWithPermissionCheck()
+        }
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    val intentSenderRequest =
+                        IntentSenderRequest.Builder(exception.resolution).build()
+                    resultLauncher.launch(intentSenderRequest)
+
+                } catch (sendEx: IntentSender.SendIntentException) {
+
+                }
+            }
+        }
+    }
 
     @SuppressLint("MissingPermission")
     @NeedsPermission(
@@ -220,42 +311,25 @@ class HomeFragment : CascadingAnimatedFragment() {
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
     fun getLastLocation() {
-        if (isLocationEnabled()) {
-            fusedLocationClient.lastLocation.addOnCompleteListener(activity as AppCompatActivity) { task ->
-                val location: Location? = task.result
-                if (location == null) {
-                    requestNewLocationData()
-                } else {
-                    latitude = location.latitude.toString()
-                    initWeather(location.latitude, location.longitude)
+        fusedLocationClient.lastLocation.addOnCompleteListener(activity as AppCompatActivity) { task ->
+            val location: Location? = task.result
+            if (location == null) {
+                requestNewLocationData()
+            } else {
+                initWeather(location.latitude, location.longitude)
 
-                }
             }
-        } else {
-            Toast.makeText(activity, "Turn on location", Toast.LENGTH_LONG)
-                .show()
-            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            startActivity(intent)
         }
-
-    }
-
-
-    private fun isLocationEnabled(): Boolean {
-        val locationManager: LocationManager =
-            activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
     }
 
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
-        val mLocationRequest = LocationRequest()
-        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        mLocationRequest.interval = 0
-        mLocationRequest.fastestInterval = 0
-        mLocationRequest.numUpdates = 1
+        val mLocationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            interval = 0
+            fastestInterval = 0
+            numUpdates = 1
+        }
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(activity as AppCompatActivity)
@@ -268,7 +342,6 @@ class HomeFragment : CascadingAnimatedFragment() {
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             val mLastLocation: Location = locationResult.lastLocation
-            latitude = mLastLocation.latitude.toString()
             initWeather(mLastLocation.latitude, mLastLocation.longitude)
         }
     }
@@ -309,7 +382,6 @@ class HomeFragment : CascadingAnimatedFragment() {
             .setMessage(messageResId)
             .show()
     }
-
 }
 
 

@@ -6,6 +6,8 @@
 
 
     <!--Content-->
+    <string name="refresh">REFRESH</string>
+
     <string name="town">TOWN</string>
     <string name="degree">\u00B0</string>
     <string name="weather">SUNNY</string>
