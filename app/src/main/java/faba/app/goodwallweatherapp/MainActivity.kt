@@ -12,7 +12,7 @@ import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val weatherViewModel : WeatherViewModel by viewModels()
+    val weatherViewModel : WeatherViewModel by viewModels()
     lateinit var navController: NavController
 
 

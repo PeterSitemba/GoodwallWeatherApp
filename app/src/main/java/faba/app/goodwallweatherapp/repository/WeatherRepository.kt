@@ -38,6 +38,7 @@ class WeatherRepository @Inject constructor(
         weatherDao.insertForecastWeather(forecastData)
     }
 
+    //fetches data directly from db, if present, when internet is unavailable
     fun getAllNoInternet() {
         val dbObservableCurrent = weatherDao.getAllCurrentWeatherData()
         val dbObservableForecast = weatherDao.getAllWeatherForecast()
@@ -76,6 +77,7 @@ class WeatherRepository @Inject constructor(
 
     }
 
+    //get current weather from api
     fun getCurrentWeather(
         lat: Double,
         lon: Double,
@@ -111,6 +113,7 @@ class WeatherRepository @Inject constructor(
 
     }
 
+    //get weather forecast from api
     fun getWeatherForecast(
         lat: Double,
         lon: Double,
@@ -130,6 +133,7 @@ class WeatherRepository @Inject constructor(
 
     }
 
+    //update current weather livedata response
     private fun updateResponseCurrent(
         status: Status,
         data: WeatherData? = null,
@@ -139,6 +143,7 @@ class WeatherRepository @Inject constructor(
         currentWeatherDataResponse.value = responseLoading
     }
 
+    //update weather forecast livedata response
     private fun updateResponseForecast(
         status: Status,
         data: ForecastData? = null,
@@ -149,12 +154,13 @@ class WeatherRepository @Inject constructor(
     }
 
 
+    //observe current adding to CompositeDisposable
     private fun observeCurrent(
         db: Observable<WeatherData>,
         remote: Observable<WeatherData>
     ) {
         if (NetworkConnectionInterceptor(context).isNetworkAvailable()) {
-            Log.e("Weather repo", "Internet available")
+            //Log.e("Weather repo", "Internet available")
 
             disposable.add(
                 Observable.concat(db, remote)
@@ -178,7 +184,7 @@ class WeatherRepository @Inject constructor(
                     ))
 
         } else {
-            Log.e("Weather repo", "No Internet")
+            //Log.e("Weather repo", "No Internet")
             disposable.add(
                 db.subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -199,6 +205,8 @@ class WeatherRepository @Inject constructor(
 
     }
 
+
+    //observe forecast adding to CompositeDisposable
     private fun observeForecast(
         db: Observable<ForecastData>,
         remote: Observable<ForecastData>
@@ -245,6 +253,7 @@ class WeatherRepository @Inject constructor(
         }
     }
 
+    //Clear Composite disposable
     fun clear() {
         disposable.clear()
     }

@@ -9,7 +9,7 @@
     <string name="refresh">REFRESH</string>
 
     <string name="town">TOWN</string>
-    <string name="degree">\u00B0</string>
+    <string name="degree">\u00B0\C</string>
     <string name="weather">SUNNY</string>
 
     <string name="min_temp">Min</string>
@@ -36,7 +36,11 @@
     <string name="snowy">Snowy - Stay warm!</string>
 
 
+    <string name="today">Today</string>
 
+
+    <string name="wind">Wind</string>
+    <string name="humidity">Humidity</string>
 
 
 </resources>

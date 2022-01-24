@@ -40,6 +40,7 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
 
 
 
+    //select forecast to be retrived in weather details fragment
     fun selectForecast(forecastDays: ForecastDays) {
         mutableSelectedForecast.value = forecastDays
     }
@@ -51,6 +52,7 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         currentTempForecast.value = ""
     }
 
+    //get current weather from api and db
     fun getCurrentWeather(
         lat: Double,
         lon: Double,
@@ -59,6 +61,7 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         repository.getCurrentWeather(lat, lon, appId)
     }
 
+    //getweather forecast from api and db
     fun getWeatherForecast(
         lat: Double,
         lon: Double,
@@ -67,15 +70,18 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         repository.getWeatherForecast(lat, lon, appId)
     }
 
+    //gets the data from the local db when internet is unavailable
     fun getAllNoInternet() {
         repository.getAllNoInternet()
     }
 
 
+    //get row count- Flows and coroutine used here
     fun getRowCount(): Flow<Int?>? {
         return repository.getRowCount()
     }
 
+    //clear disposable when clearing viewmodel
     override fun onCleared() {
         super.onCleared()
         repository.clear()

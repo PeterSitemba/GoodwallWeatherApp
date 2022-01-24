@@ -15,7 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -31,7 +32,6 @@ import faba.app.goodwallweatherapp.utils.navigateTo
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
 import faba.app.goodwallweatherapp.view.animations.CascadingAnimatedFragment
 import faba.app.goodwallweatherapp.view.animations.NavAnimations
-import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
 import kotlinx.coroutines.launch
 import permissions.dispatcher.*
@@ -40,12 +40,12 @@ import kotlin.math.roundToInt
 @RuntimePermissions
 class HomeFragment : CascadingAnimatedFragment() {
 
-    private val weatherViewModel: WeatherViewModel by activityViewModels()
     var forecastList: MutableList<ForecastDays> = mutableListOf()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val listAdapter = ForecastAdapter { forecastDays -> adapterOnClick(forecastDays) }
 
 
+    //location activity result and intent
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
 
@@ -54,7 +54,7 @@ class HomeFragment : CascadingAnimatedFragment() {
                     requestLocation()
                 } else {
                     requestLocation()
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
                 }
             } else {
                 activity?.finish()
@@ -100,15 +100,21 @@ class HomeFragment : CascadingAnimatedFragment() {
 
     }
 
+
+    //checks to see if there is an internet connection and location is enabled
     private fun checkConnectionAndDB() {
         lifecycleScope.launch {
-            weatherViewModel.getRowCount()?.collect {
+            viewModel.getRowCount()?.collect {
                 if (it == 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
                     cLNoInternet.visibility = View.VISIBLE
                 } else if (it!! > 0 && !NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
                     cLNoInternet.visibility = View.GONE
-                    weatherViewModel.getAllNoInternet()
+                    viewModel.getAllNoInternet()
+                } else if (it > 0 && NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
+                    cLNoInternet.visibility = View.GONE
+                    viewModel.getAllNoInternet()
+                    requestLocation()
                 } else {
                     requestLocation()
                     cLNoInternet.visibility = View.GONE
@@ -138,13 +144,14 @@ class HomeFragment : CascadingAnimatedFragment() {
     }
 
 
+    //initialize request to api
     fun initWeather(lat: Double, lon: Double) {
-        weatherViewModel.getCurrentWeather(
+        viewModel.getCurrentWeather(
             lat,
             lon,
             Constants.API_KEY
         )
-        weatherViewModel.getWeatherForecast(
+        viewModel.getWeatherForecast(
             lat,
             lon,
             Constants.API_KEY
@@ -152,11 +159,12 @@ class HomeFragment : CascadingAnimatedFragment() {
     }
 
 
+    //onclick for weather forecast items
     private fun adapterOnClick(forecastDays: ForecastDays) {
 
-        weatherViewModel.selectForecast(forecastDays)
-        weatherViewModel.fullForecastList.value =
-            weatherViewModel.fullForecastList.value?.filter { forecastsDays ->
+        viewModel.selectForecast(forecastDays)
+        viewModel.fullForecastList.value =
+            viewModel.fullForecastList.value?.filter { forecastsDays ->
                 forecastsDays.dt_txt.contains(forecastDays.dt_txt.substring(0, 11))
             }?.toMutableList()
 
@@ -167,28 +175,34 @@ class HomeFragment : CascadingAnimatedFragment() {
 
     }
 
-    private fun refresh(){
-        if(!NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()){
-            weatherViewModel.getAllNoInternet()
-            Toast.makeText(activity, resources.getString(R.string.error_noConnection), Toast.LENGTH_SHORT).show()
+    //refresh weather, fetch updated weather. Called by swiperefresh
+    private fun refresh() {
+        if (!NetworkConnectionInterceptor(activity as AppCompatActivity).isNetworkAvailable()) {
+            viewModel.getAllNoInternet()
+            Toast.makeText(
+                activity,
+                resources.getString(R.string.error_noConnection),
+                Toast.LENGTH_SHORT
+            ).show()
             swiperefresh.isRefreshing = false
-        }else{
+        } else {
             requestLocation()
         }
     }
 
+    //currentweather observable
     private fun observeCurrentViewModel() {
-        weatherViewModel.currentWeather.observe(this, { response ->
+        viewModel.currentWeather.observe(this, { response ->
             when (response.status) {
                 Status.LOADING -> {
                     Log.e("MainActivity", "Loading...")
                 }
                 Status.ERROR -> {
                     Log.e("MainActivity", "Error!!!")
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
                 }
                 else -> {
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
                     response.data.let {
                         Log.e("MainActivity", it!!.main.temp.toString())
                         initHeaderView(it)
@@ -199,70 +213,75 @@ class HomeFragment : CascadingAnimatedFragment() {
         })
     }
 
+    //initailize the top part of the view
     @SuppressLint("SetTextI18n")
     private fun initHeaderView(weatherData: WeatherData) {
-
         val window: Window = activity?.window!!
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         when (weatherData.weather[0].main) {
             "Clear" -> {
-                window.statusBarColor = this.resources.getColor(R.color.sunny_header)
-                cLHeader.background = resources.getDrawable(R.drawable.sunny)
-                cLBody.setBackgroundColor(resources.getColor(R.color.sunny))
+                window.statusBarColor = ContextCompat.getColor(activity!!, R.color.sunny_header)
+                cLHeader.background = ResourcesCompat.getDrawable(resources, R.drawable.sunny, null)
+                cLBody.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.sunny))
                 txtWeather.text = "SUNNY"
 
             }
             "Clouds" -> {
-                window.statusBarColor = this.resources.getColor(R.color.cloudy)
-                cLHeader.background = resources.getDrawable(R.drawable.cloudy)
-                cLBody.setBackgroundColor(resources.getColor(R.color.cloudy))
+                window.statusBarColor = ContextCompat.getColor(activity!!, R.color.cloudy)
+                cLHeader.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.cloudy, null)
+                cLBody.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.cloudy))
                 txtWeather.text = "CLOUDY"
 
 
             }
             "Rain" -> {
-                window.statusBarColor = this.resources.getColor(R.color.rainy)
-                cLHeader.background = resources.getDrawable(R.drawable.rainy)
-                cLBody.setBackgroundColor(resources.getColor(R.color.rainy))
+                window.statusBarColor = ContextCompat.getColor(activity!!, R.color.rainy)
+                cLHeader.background = ResourcesCompat.getDrawable(resources, R.drawable.rainy, null)
+                cLBody.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.rainy))
                 txtWeather.text = "RAIN"
 
 
             }
             "Snow" -> {
-                window.statusBarColor = this.resources.getColor(R.color.rainy)
-                cLHeader.background = resources.getDrawable(R.drawable.snowy)
-                cLBody.setBackgroundColor(resources.getColor(R.color.rainy))
+                window.statusBarColor = ContextCompat.getColor(activity!!, R.color.snowy)
+                cLHeader.background = ResourcesCompat.getDrawable(resources, R.drawable.snowy, null)
+                cLBody.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.snowy))
                 txtWeather.text = "SNOW"
-
 
             }
         }
 
         txtName.text = weatherData.name
-        txtTemp.text = "${weatherData.main.temp.roundToInt()}\u00B0"
-        txtMinTemp.text = "${weatherData.main.temp_min.roundToInt()}\u00B0"
-        txtCurrentTemp.text = "${weatherData.main.temp.roundToInt()}\u00B0"
-        txtMaxTemp.text = "${weatherData.main.temp_max.roundToInt()}\u00B0"
+        txtTemp.text =
+            "${weatherData.main.temp.roundToInt()}${resources.getString(R.string.degree)}"
+        txtMinTemp.text =
+            "${weatherData.main.temp_min.roundToInt()}${resources.getString(R.string.degree)}"
+        txtCurrentTemp.text =
+            "${weatherData.main.temp.roundToInt()}${resources.getString(R.string.degree)}"
+        txtMaxTemp.text =
+            "${weatherData.main.temp_max.roundToInt()}${resources.getString(R.string.degree)}"
 
-        weatherViewModel.currentTempForecast.value = "${weatherData.main.temp.roundToInt()}\u00B0"
+        viewModel.currentTempForecast.value =
+            "${weatherData.main.temp.roundToInt()}${resources.getString(R.string.degree)}"
     }
 
 
+    //forecast weather observable
     private fun observeForecastViewModel(listAdapter: ForecastAdapter) {
-        weatherViewModel.forecastWeather.observe(this, { response ->
+        viewModel.forecastWeather.observe(this, { response ->
             when (response.status) {
                 Status.LOADING -> {
                     Log.e("MainActivity", "Loading...")
                 }
                 Status.ERROR -> {
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
                     Log.e("MainActivity", "Error!!!")
                     swiperefresh.isRefreshing = false
                 }
                 else -> {
                     swiperefresh.isRefreshing = false
-                    weatherViewModel.loading.value = false
+                    viewModel.loading.value = false
 
                     response.data.let {
                         forecastList = it!!.list.toMutableList().filter { forecastsDays ->
@@ -270,8 +289,8 @@ class HomeFragment : CascadingAnimatedFragment() {
                         }.toMutableList()
 
                         listAdapter.submitList(forecastList)
-                        listAdapter.setTheCurrentTemp(weatherViewModel.currentTempForecast.value!!)
-                        weatherViewModel.fullForecastList.value = it.list.toMutableList()
+                        listAdapter.setTheCurrentTemp(viewModel.currentTempForecast.value!!)
+                        viewModel.fullForecastList.value = it.list.toMutableList()
                     }
                 }
             }
@@ -279,6 +298,7 @@ class HomeFragment : CascadingAnimatedFragment() {
         })
     }
 
+    //request location with a subsequent request to api
     private fun requestLocation() {
 
         val mLocationRequest = LocationRequest.create().apply {
@@ -307,12 +327,13 @@ class HomeFragment : CascadingAnimatedFragment() {
                     resultLauncher.launch(intentSenderRequest)
 
                 } catch (sendEx: IntentSender.SendIntentException) {
-
+                    //catch error
                 }
             }
         }
     }
 
+    //region location request and permission handlers
     @SuppressLint("MissingPermission")
     @NeedsPermission(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -389,6 +410,9 @@ class HomeFragment : CascadingAnimatedFragment() {
             .setMessage(messageResId)
             .show()
     }
+
+    //end of region location request and permission handlers
+
 }
 
 

@@ -18,4 +18,11 @@ object DateUtil {
         val dayOfWeek = Calendar.getInstance().time
         return SimpleDateFormat("EEEE").format(dayOfWeek)
     }
+
+    @SuppressLint("SimpleDateFormat")
+    fun getTime(theDate: String): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val date = formatter.parse(theDate)
+        return SimpleDateFormat("HH:mm").format(date)
+    }
 }

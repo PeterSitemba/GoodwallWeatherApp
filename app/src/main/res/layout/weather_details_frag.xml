@@ -26,7 +26,8 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:src="@drawable/back_button"
         app:layout_constraintStart_toStartOf="@+id/contentMarginLeft"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+         />
 
 
     <LinearLayout
@@ -42,7 +43,6 @@
             android:id="@+id/txtDayDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today"
             android:textSize="@dimen/txt_xxlarge" />
 
         <LinearLayout
@@ -54,7 +54,6 @@
                 android:id="@+id/txtTempDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15\u00B0"
                 android:textSize="@dimen/txt_xxxxlarge"
                 android:textStyle="bold" />
 
@@ -70,7 +69,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_x_small"
-                android:text="clouds"
                 android:textSize="@dimen/txt_xlarge" />
 
         </LinearLayout>
@@ -88,7 +86,6 @@
         android:id="@+id/txtSlogan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cloudy- Enjoy the day"
         android:textSize="@dimen/txt_xxlarge"
         app:layout_constraintStart_toStartOf="@id/contentMarginLeft"
         app:layout_constraintTop_toBottomOf="@+id/ivDetailsBg" />
@@ -96,7 +93,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDayForecast"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/rv_height"
         android:layout_marginTop="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_small"
         app:layout_constraintBottom_toTopOf="@+id/dividerTop"
@@ -147,7 +144,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Wind"
+            android:text="@string/wind"
             android:textSize="@dimen/txt_xxlarge" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -161,7 +158,6 @@
             android:id="@+id/txtWindSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10km/h"
             android:textSize="@dimen/txt_xxlarge" />
 
     </LinearLayout>
@@ -179,7 +175,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Humidity"
+            android:text="@string/humidity"
             android:textSize="@dimen/txt_xxlarge" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -193,7 +189,6 @@
             android:id="@+id/txtHumidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10km/h"
             android:textSize="@dimen/txt_xxlarge" />
 
     </LinearLayout>

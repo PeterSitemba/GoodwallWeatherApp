@@ -5,24 +5,24 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
 import faba.app.goodwallweatherapp.utils.DateUtil
-import kotlinx.android.synthetic.main.list_forecast.view.*
+import kotlinx.android.synthetic.main.list_day_forecast.view.*
 import kotlin.math.roundToInt
 
-class ForecastAdapter(
-    private val onClick: (ForecastDays) -> Unit
-) : ListAdapter<ForecastDays, ForecastAdapter.ViewHolderForecast>(ForecastDiffCallback) {
 
-    var currentTempForecast = ""
+class DayForecastAdapter(
+    private val onClick: (ForecastDays) -> Unit
+) : ListAdapter<ForecastDays, DayForecastAdapter.ViewHolderDayForecast>(DayForecastDiffCallback) {
+
     private var context: Context? = null
 
-
-    class ViewHolderForecast(itemView: View, val onClick: (ForecastDays) -> Unit) :
+    class ViewHolderDayForecast(itemView: View, val onClick: (ForecastDays) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
         private var currentForecast: ForecastDays? = null
 
@@ -41,53 +41,41 @@ class ForecastAdapter(
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderForecast {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderDayForecast {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_forecast, parent, false)
+            .inflate(R.layout.list_day_forecast, parent, false)
         context = parent.context
-        return ViewHolderForecast(view, onClick)
+        return ViewHolderDayForecast(view, onClick)
     }
 
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewHolderForecast, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderDayForecast, position: Int) {
         when (getItem(position).weather[0].main) {
             "Clear" -> {
-                holder.itemView.ivWeatherIcon.setImageResource(R.drawable.clear)
+                holder.itemView.ivTimeTemp.setImageResource(R.drawable.ic_sunny_bg)
             }
             "Clouds" -> {
-                holder.itemView.ivWeatherIcon.setImageResource(R.drawable.ic_cloudy)
+                holder.itemView.ivTimeTemp.setImageResource(R.drawable.ic_cloudy_bg)
             }
             "Rain" -> {
-                holder.itemView.ivWeatherIcon.setImageResource(R.drawable.ic_rainy)
+                holder.itemView.ivTimeTemp.setImageResource(R.drawable.ic_rainy_bg)
             }
             "Snow" -> {
-                holder.itemView.ivWeatherIcon.setImageResource(R.drawable.ic_snowy)
+                holder.itemView.ivTimeTemp.setImageResource(R.drawable.ic_snowy_bg)
             }
         }
 
-        var day = DateUtil.getDay(getItem(position).dt_txt)
-        var temp =
+        holder.itemView.txtTimeOfDay.text = DateUtil.getTime(getItem(position).dt_txt)
+        holder.itemView.txtTempAtTime.text =
             "${getItem(position).main.temp.roundToInt()}${context?.resources?.getString(R.string.degree)}"
-        if (day == DateUtil.getDayOfWeek()) {
-            day = "Today"
-            temp = currentTempForecast
-        }
-        holder.itemView.txtDay.text = day
-        holder.itemView.txtTempForecast.text = temp
-
 
         holder.bind(getItem(position))
-
-    }
-
-    fun setTheCurrentTemp(currentTemp: String) {
-        currentTempForecast = currentTemp
     }
 
 }
 
-object ForecastDiffCallback : DiffUtil.ItemCallback<ForecastDays>() {
+object DayForecastDiffCallback : DiffUtil.ItemCallback<ForecastDays>() {
     override fun areItemsTheSame(oldItem: ForecastDays, newItem: ForecastDays): Boolean {
         return oldItem == newItem
     }
