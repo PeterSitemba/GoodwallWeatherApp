@@ -1,4 +1,4 @@
-package faba.app.goodwallweatherapp.utils
+package faba.app.goodwallweatherapp.view.animations
 
 import android.view.View
 import androidx.annotation.AnimRes

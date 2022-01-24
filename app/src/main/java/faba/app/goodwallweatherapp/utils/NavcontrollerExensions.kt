@@ -1,10 +1,12 @@
 package faba.app.goodwallweatherapp.utils
 
+import android.animation.AnimatorSet
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
+import faba.app.goodwallweatherapp.view.animations.NavAnimations
 
 fun NavController.navigateTo(@IdRes destId: Int, options: NavOptions?) {
     navigateTo(destId, null, options)

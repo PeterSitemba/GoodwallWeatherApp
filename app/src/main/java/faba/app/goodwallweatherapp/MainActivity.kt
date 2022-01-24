@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -24,6 +25,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().apply {
+            this.setKeepOnScreenCondition {
+                weatherViewModel.loading.value!!
+            }
+        }
         setContentView(R.layout.activity_main)
 
         val navHostFragment =
@@ -31,24 +38,5 @@ class MainActivity : AppCompatActivity() {
 
         navController = navHostFragment.navController
 
-    }
-
-    private fun observeViewModel() {
-        weatherViewModel.currentWeather.observe(this, { response ->
-            when (response.status) {
-                Status.LOADING -> {
-                    Log.e("MainActivity", "Loading...")
-                }
-                Status.ERROR -> {
-                    Log.e("MainActivity", "Error!!!")
-                }
-                else -> {
-                    response.data.let {
-                        Log.e("MainActivity", it!!.main.temp.toString())
-                    }
-                }
-            }
-
-        })
     }
 }

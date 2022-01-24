@@ -7,7 +7,7 @@
 
     <!--Content-->
     <string name="town">TOWN</string>
-    <string name="degree">25\u00B0</string>
+    <string name="degree">\u00B0</string>
     <string name="weather">SUNNY</string>
 
     <string name="min_temp">Min</string>
@@ -21,6 +21,17 @@
 
     <string name="permission_location_denied">Location Permissions denied</string>
     <string name="permission_location_never_ask_again">Location permissions were denied with never ask again.</string>
+
+
+    <string name="km">km/h</string>
+    <string name="percent">%</string>
+
+
+
+    <string name="clear">Sunny - Brighten up!</string>
+    <string name="cloudy">Cloudy - Enjoy the day!</string>
+    <string name="rainy">Rainy - Don\'t forget your umbrella!</string>
+    <string name="snowy">Snowy - Stay warm!</string>
 
 
 

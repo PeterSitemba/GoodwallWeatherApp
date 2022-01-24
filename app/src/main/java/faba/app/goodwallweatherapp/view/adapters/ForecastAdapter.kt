@@ -20,6 +20,7 @@ class ForecastAdapter(
     class ViewHolderForecast(itemView: View, val onClick: (ForecastDays) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
         private var currentForecast: ForecastDays? = null
+
         init {
             itemView.setOnClickListener {
                 currentForecast?.let {
@@ -58,7 +59,11 @@ class ForecastAdapter(
             }
         }
 
-        holder.itemView.txtDay.text = DateUtil.getDay(getItem(position).dt_txt)
+        var day = DateUtil.getDay(getItem(position).dt_txt)
+        if (day == DateUtil.getDayOfWeek()) {
+            day = "Today"
+        }
+        holder.itemView.txtDay.text = day
         holder.itemView.txtTempForecast.text =
             "${getItem(position).main.temp.roundToInt()}\u00B0"
 

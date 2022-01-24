@@ -1,6 +1,7 @@
 package faba.app.goodwallweatherapp.view.fragments
 
 import android.Manifest
+import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -15,34 +16,30 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.location.*
 import faba.app.goodwallweatherapp.R
 import faba.app.goodwallweatherapp.models.current.WeatherData
 import faba.app.goodwallweatherapp.models.forecast.ForecastDays
-import faba.app.goodwallweatherapp.utils.NavAnimations
+import faba.app.goodwallweatherapp.view.animations.NavAnimations
 import faba.app.goodwallweatherapp.utils.SpanningLinearLayoutManager
 import faba.app.goodwallweatherapp.utils.Status
 import faba.app.goodwallweatherapp.utils.navigateTo
 import faba.app.goodwallweatherapp.view.adapters.ForecastAdapter
+import faba.app.goodwallweatherapp.view.animations.CascadingAnimatedFragment
 import faba.app.goodwallweatherapp.viewmodel.WeatherViewModel
 import kotlinx.android.synthetic.main.host_frag.*
 import permissions.dispatcher.*
 import kotlin.math.roundToInt
 
 @RuntimePermissions
-class HomeFragment : Fragment() {
+class HomeFragment : CascadingAnimatedFragment() {
 
     lateinit var latitude: String
     val weatherViewModel: WeatherViewModel by activityViewModels()
     var forecastList: MutableList<ForecastDays> = mutableListOf()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    companion object {
-        const val KEY_FORECAST = "forecast_day"
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,6 +62,7 @@ class HomeFragment : Fragment() {
         observeForecastViewModel(listAdapter)
 
 
+        introAnimator.start()
 
         rvForecast.layoutManager = SpanningLinearLayoutManager(
             activity,
@@ -73,6 +71,15 @@ class HomeFragment : Fragment() {
         )
         rvForecast.adapter = listAdapter
 
+    }
+
+    override fun setIntroAnimator() {
+        introAnimator.addViews(
+            rvForecast after 200.milliseconds,
+            txtName after 100.milliseconds,
+            txtTemp after 100.milliseconds,
+            txtWeather after 100.milliseconds
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -102,13 +109,10 @@ class HomeFragment : Fragment() {
 
     private fun adapterOnClick(forecastDays: ForecastDays) {
 
-        val bundle = bundleOf(
-            KEY_FORECAST to forecastDays
-        )
 
+        weatherViewModel.selectForecast(forecastDays)
         navController.navigateTo(
             R.id.action_homeFragment_to_weatherDetailsFrag,
-            bundle,
             animationsOverride = NavAnimations.DEFAULT
         )
 
@@ -123,8 +127,10 @@ class HomeFragment : Fragment() {
                 }
                 Status.ERROR -> {
                     Log.e("MainActivity", "Error!!!")
+                    weatherViewModel.loading.value = false
                 }
                 else -> {
+                    weatherViewModel.loading.value = false
                     response.data.let {
                         Log.e("MainActivity", it!!.main.temp.toString())
 

@@ -112,6 +112,18 @@
         app:dividerColor="@android:color/darker_gray"
         app:layout_constraintBottom_toTopOf="@+id/dividerBottom" />
 
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dividerCenter"
+        android:layout_width="@dimen/divider"
+        android:layout_height="0dp"
+        app:dividerColor="@android:color/darker_gray"
+        app:layout_constraintBottom_toTopOf="@+id/dividerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dividerTop"
+
+        />
+
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/dividerBottom"
@@ -121,22 +133,22 @@
         app:dividerColor="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/dividerTop"
         app:layout_constraintBottom_toTopOf="@+id/dividerBottom"
-        >
+        app:layout_constraintEnd_toStartOf="@+id/dividerCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dividerTop">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/txt_xxlarge"
             android:text="Wind"
-            />
+            android:textSize="@dimen/txt_xxlarge" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="1dp"
@@ -146,13 +158,46 @@
             android:background="@android:color/black" />
 
         <TextView
+            android:id="@+id/txtWindSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/txt_xxlarge"
             android:text="10km/h"
-            />
+            android:textSize="@dimen/txt_xxlarge" />
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/dividerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dividerCenter"
+        app:layout_constraintTop_toTopOf="@+id/dividerTop">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity"
+            android:textSize="@dimen/txt_xxlarge" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="@dimen/margin_x_small"
+            android:layout_marginEnd="@dimen/margin_x_small"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:id="@+id/txtHumidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10km/h"
+            android:textSize="@dimen/txt_xxlarge" />
+
+    </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

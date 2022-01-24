@@ -110,4 +110,8 @@ dependencies {
     implementation "com.github.permissions-dispatcher:permissionsdispatcher:$permissions"
     kapt "com.github.permissions-dispatcher:permissionsdispatcher-processor:$permissions"
 
+    //Splash screen api
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
+
+
 }
