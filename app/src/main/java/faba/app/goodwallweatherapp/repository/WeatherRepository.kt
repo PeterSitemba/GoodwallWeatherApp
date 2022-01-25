@@ -30,6 +30,17 @@ class WeatherRepository @Inject constructor(
 
     fun getRowCount() = weatherDao.getRowCountDistinct()
 
+    fun getCurrentWeatherApiForTest(
+        lat: Double,
+        lon: Double,
+        appId: String
+    ) = retrofitService.getCurrentWeather(
+        lat,
+        lon,
+        appId,
+        units = "metric"
+    )
+
     private fun insertCurrent(weatherData: WeatherData) {
         weatherDao.insertCurrentWeather(weatherData)
     }

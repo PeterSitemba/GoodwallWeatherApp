@@ -67,6 +67,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:2.4.0"
 
     //rxJava
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
@@ -89,6 +90,9 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt "androidx.hilt:hilt-compiler:1.0.0"
+    testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    // ...with Kotlin.
+    kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$viewmodel_compose_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$viewmodel_compose_version"
@@ -113,6 +117,21 @@ dependencies {
     //Splash screen api
     implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    //MockWebserver
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+
+    testImplementation"com.squareup.okhttp3:mockwebserver:$okhttp_version"
+
+
+    // Needed for unit testing API
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+    testImplementation 'org.mockito:mockito-core:3.10.0'
+    androidTestImplementation 'org.mockito:mockito-android:3.10.0'
+
 
 
 
