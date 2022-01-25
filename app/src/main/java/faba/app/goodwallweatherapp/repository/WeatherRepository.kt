@@ -171,7 +171,6 @@ class WeatherRepository @Inject constructor(
         remote: Observable<WeatherData>
     ) {
         if (NetworkConnectionInterceptor(context).isNetworkAvailable()) {
-            //Log.e("Weather repo", "Internet available")
 
             disposable.add(
                 Observable.concat(db, remote)
@@ -195,7 +194,6 @@ class WeatherRepository @Inject constructor(
                     ))
 
         } else {
-            //Log.e("Weather repo", "No Internet")
             disposable.add(
                 db.subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
