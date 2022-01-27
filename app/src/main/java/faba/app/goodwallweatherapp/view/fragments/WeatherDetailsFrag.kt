@@ -78,18 +78,21 @@ class WeatherDetailsFrag : CascadingAnimatedFragment() {
             when (weather) {
                 "Clear" -> {
                     txtSlogan.text = resources.getString(R.string.clear)
+                    ivDetailsBg.setImageResource(R.drawable.sunny_bg_small)
                 }
                 "Clouds" -> {
                     txtSlogan.text = resources.getString(R.string.cloudy)
+                    ivDetailsBg.setImageResource(R.drawable.cloudy_bg_small)
 
                 }
                 "Rain" -> {
                     txtSlogan.text = resources.getString(R.string.rainy)
+                    ivDetailsBg.setImageResource(R.drawable.rainy_bg_small)
 
                 }
                 "Snow" -> {
                     txtSlogan.text = resources.getString(R.string.snowy)
-
+                    ivDetailsBg.setImageResource(R.drawable.snowy_bg_small)
                 }
             }
 
